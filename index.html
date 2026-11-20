@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meet KAVYA in 3D · Kaushal Mela 2026 · APS Jorhat</title>
+<meta name="description" content="Bring KAVYA, the robot of Kaushal Mela 2026, into your room with augmented reality.">
+<meta property="og:title" content="Meet KAVYA in your room!">
+<meta property="og:description" content="Kaushal Mela 2026 · Army Public School Jorhat · A Department of Skill and Innovation Initiative">
+<meta property="og:image" content="kavya-card.jpg">
+<meta name="theme-color" content="#0a1c62">
+<script type="module" src="model-viewer.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;color:#fff;background:radial-gradient(ellipse at 50% 30%,#1c46b8 0%,#0a1c62 50%,#040a28 100%);min-height:100%;display:flex;flex-direction:column;overflow-x:hidden}
+header{padding:16px 20px 4px;text-align:center}
+header small{display:block;font-size:13px;letter-spacing:.04em;color:#ffd96a;font-weight:600}
+h1{font-size:clamp(24px,6vw,40px);font-weight:800;margin-top:4px;line-height:1.15}
+header p{font-size:14px;color:#c9d6ff;margin-top:4px}
+model-viewer{width:100%;height:52vh;min-height:320px;background:transparent;--poster-color:transparent}
+.big{display:flex;flex-direction:column;gap:10px;align-items:center;padding:8px 16px 0}
+.btn{border:0;border-radius:999px;font-weight:800;font-size:18px;padding:15px 26px;cursor:pointer;width:min(92vw,380px)}
+.btn.ar{background:#f7c948;color:#0b1846;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+.btn.cam{background:#fff;color:#0b1846}
+.btn:focus-visible,.acts button:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.acts{display:flex;gap:10px;justify-content:center;padding:12px 16px 4px;flex-wrap:wrap}
+.acts button{background:rgba(255,255,255,.12);color:#fff;border:1.5px solid rgba(255,255,255,.35);border-radius:999px;padding:10px 18px;font-size:16px;font-weight:700;cursor:pointer}
+.acts button.on{background:#fff;color:#0b1846}
+.note{max-width:560px;margin:8px auto 0;padding:10px 16px;border-radius:12px;background:rgba(255,255,255,.1);font-size:14px;text-align:center;display:none}
+.how{max-width:560px;margin:10px auto 0;padding:0 20px;font-size:14.5px;line-height:1.55;color:#dbe4ff}
+.how b{color:#fff}.how .hi{color:#ffe08a;margin-top:6px}
+footer{text-align:center;font-size:13px;color:#aebce8;padding:16px 16px 22px;line-height:1.6}
+footer b{color:#fff}
+.prog{position:absolute;left:20%;right:20%;top:50%;height:6px;border-radius:9px;background:rgba(255,255,255,.15);overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:#f7c948;transition:width .2s}
+#arHidden{display:none}
+/* camera mode */
+#cam{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;display:none;background:#000}
+#camUI{position:fixed;left:0;right:0;bottom:0;z-index:5;display:none;flex-direction:column;align-items:center;gap:10px;padding:14px 12px calc(18px + env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(0,0,0,.65))}
+#camUI .hint{font-size:14px;font-weight:600;text-shadow:0 2px 6px #000;text-align:center}
+#camUI .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+#camUI button{background:rgba(255,255,255,.92);color:#0b1846;border:0;border-radius:999px;padding:12px 18px;font-weight:800;font-size:16px}
+#camUI button.x{background:#e53935;color:#fff}
+body.camOn{background:#000}
+body.camOn > :not(#cam):not(#camUI):not(model-viewer){display:none!important}
+body.camOn #cam,body.camOn #camUI{display:flex}
+body.camOn #cam{display:block}
+body.camOn model-viewer{position:fixed;left:0;top:0;width:100vw;height:78vh;z-index:2;will-change:transform}
+#bubble{position:fixed;left:50%;top:max(16px,env(safe-area-inset-top));transform:translateX(-50%);z-index:6;background:#fff;color:#0b1846;border-radius:20px;padding:12px 18px;font-weight:700;font-size:16px;max-width:88vw;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.4);opacity:0;transition:opacity .3s;pointer-events:none}
+#bubble.on{opacity:1}
+</style>
+</head>
+<body>
+<video id="cam" playsinline muted autoplay></video>
+<header>
+  <small>Kaushal Mela 2026 · Army Public School Jorhat</small>
+  <h1>Meet KAVYA in your room</h1>
+  <p>Tap KAVYA to hear her · Drag to turn her around</p>
+</header>
+
+<model-viewer id="mv" src="kavya.glb" ios-src="kavya.usdz" alt="KAVYA, the robot of Kaushal Mela 2026"
+  ar ar-modes="webxr scene-viewer quick-look" ar-scale="auto" ar-placement="floor"
+  camera-controls touch-action="pan-y" autoplay animation-name="Idle"
+  camera-orbit="20deg 78deg 1.3m" field-of-view="30deg" min-camera-orbit="auto auto .6m" max-camera-orbit="auto auto 2.5m"
+  shadow-intensity="1" shadow-softness=".8" exposure="1.05" environment-image="neutral" interaction-prompt="none">
+  <button slot="ar-button" id="arHidden"></button>
+  <div class="prog" slot="progress-bar"><i id="bar"></i></div>
+</model-viewer>
+
+<div class="big">
+  <button class="btn ar" id="arBtn">🪄 See KAVYA in your room (AR)</button>
+  <button class="btn cam" id="camBtn">📷 Camera mode</button>
+</div>
+<div class="note" id="noar">This phone does not support full AR. Use <b>Camera mode</b>: KAVYA floats in front of your camera.</div>
+
+<div class="acts" role="group" aria-label="KAVYA moves">
+  <button data-a="Idle" class="on">Float</button>
+  <button data-a="Hello">👋 Say hello</button>
+  <button data-a="Dance">💃 Dance</button>
+</div>
+
+<section class="how">
+  <p><b>AR:</b> tap the yellow button, then slowly move your phone over the floor or a table. KAVYA appears in your room. Walk around her and pinch to resize.</p>
+  <p><b>Camera mode:</b> works on every phone. Allow the camera, then move your phone around: KAVYA stays floating in your room.</p>
+  <p class="hi">पीला बटन दबाएँ और फ़ोन को धीरे-धीरे फ़र्श पर घुमाएँ — काव्या आपके कमरे में आ जाएगी!</p>
+</section>
+
+<footer>See KAVYA live at <b>Kaushal Mela 2026</b> · 28 November · APS Jorhat<br>A Department of Skill and Innovation Initiative</footer>
+
+<div id="camUI">
+  <div class="hint">Move your phone slowly — KAVYA floats in your room</div>
+  <div class="row"><button id="cHello">👋 Hello</button><button id="cDance">💃 Dance</button><button class="x" id="cExit">✕ Exit</button></div>
+</div>
+<div id="bubble"></div>
+
+<script type="module">
+const $ = id => document.getElementById(id), mv = $('mv');
+mv.addEventListener('progress', e => { $('bar').style.width = (e.detail.totalProgress * 100) + '%'; if (e.detail.totalProgress === 1) $('bar').parentElement.style.display = 'none'; });
+
+/* ---------------- sound ---------------- */
+let AC;
+const ac = () => { if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume(); return AC; };
+function tone(f, t, d, v = .18, type = 'sine', f2){ const c = ac(), o = c.createOscillator(), g = c.createGain(); o.type = type; o.frequency.setValueAtTime(f, c.currentTime + t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, c.currentTime + t + d); g.gain.setValueAtTime(0, c.currentTime + t); g.gain.linearRampToValueAtTime(v, c.currentTime + t + .01); g.gain.exponentialRampToValueAtTime(.001, c.currentTime + t + d); o.connect(g); g.connect(c.destination); o.start(c.currentTime + t); o.stop(c.currentTime + t + d + .02); }
+const chime = () => [880, 1109, 1319, 1760].forEach((f, i) => tone(f, i * .08, .5, .12));
+const boop = () => { tone(520, 0, .12, .2, 'square', 900); tone(900, .12, .14, .15, 'square', 600); };
+const giggle = () => [0, .1, .2, .3].forEach((t, i) => tone(700 + i * 90, t, .09, .14, 'triangle', 1000 + i * 80));
+function noiseHit(t, v = .25, f = 1800){ const c = ac(), n = c.createBufferSource(), b = c.createBuffer(1, c.sampleRate * .1, c.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length); n.buffer = b; const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = f; const g = c.createGain(); g.gain.value = v; n.connect(bp); bp.connect(g); g.connect(c.destination); n.start(c.currentTime + t); }
+function danceMusic(sec = 8){ const B = .3; for (let i = 0; i < sec / B; i++){ const t = i * B; if (i % 2 === 0) tone(120, t, .25, .5, 'sine', 50); else noiseHit(t, .22); if (i % 4 === 3) noiseHit(t + B / 2, .15, 3000); const mel = [523, 587, 659, 784, 880, 784, 659, 587]; if (i % 2 === 0) tone(mel[(i / 2) % 8], t, .25, .08, 'triangle'); } }
+function speak(text, lang){ try { const s = window.speechSynthesis; if (!s) return false; s.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = lang; u.pitch = 1.35; u.rate = 1; const vs = s.getVoices(); const v = vs.find(v => v.lang === lang) || vs.find(v => v.lang && v.lang.startsWith(lang.slice(0, 2))); if (v) u.voice = v; s.speak(u); return true; } catch (e) { return false; } }
+function bubble(t, ms = 3500){ const b = $('bubble'); b.textContent = t; b.classList.add('on'); clearTimeout(bubble.t); bubble.t = setTimeout(() => b.classList.remove('on'), ms); }
+const LINES = [
+  ['Namaste! I am KAVYA, your Kaushal Mela robot!', 'नमस्ते! मैं काव्या हूँ।'],
+  ['See you at Kaushal Mela on 28 November at Army Public School Jorhat!', '28 नवंबर को कौशल मेले में मिलते हैं!'],
+  ['Hee hee! That tickles!', 'हीही! गुदगुदी होती है!'],
+  ['Learn a new skill today!', 'आज एक नया हुनर सीखिए!']
+];
+let li = 0;
+function hello(){ play('Hello'); chime(); setTimeout(() => { const [en, hi] = LINES[li % 2 ? 1 : 0]; li++; bubble(en); speak(en, 'en-IN'); }, 400); }
+function dance(){ play('Dance', 2); danceMusic(8); bubble('Let’s dance! 💃'); }
+function play(name, reps){ mv.animationName = name; mv.currentTime = 0; mv.play({ repetitions: name === 'Idle' ? Infinity : (reps || 1) }); document.querySelectorAll('.acts button').forEach(x => x.classList.toggle('on', x.dataset.a === name)); }
+mv.addEventListener('finished', () => play('Idle'));
+document.querySelectorAll('.acts button').forEach(b => b.addEventListener('click', () => { ac(); const a = b.dataset.a; if (a === 'Hello') hello(); else if (a === 'Dance') dance(); else { play('Idle'); boop(); } }));
+let taps = 0;
+mv.addEventListener('click', () => { ac(); taps++; if (taps % 3 === 0) { giggle(); play('Hello'); const l = LINES[2]; bubble(l[0]); speak(l[0], 'en-IN'); } else { boop(); const l = LINES[3]; bubble(l[0], 2000); } });
+
+/* ---------------- real AR ---------------- */
+$('arBtn').addEventListener('click', () => { ac(); chime(); if (mv.canActivateAR) mv.activateAR(); else { $('noar').style.display = 'block'; startCam(); } });
+mv.addEventListener('ar-status', e => { if (e.detail.status === 'session-started') { setTimeout(() => { play('Hello'); chime(); speak(LINES[0][0], 'en-IN'); }, 1500); } if (e.detail.status === 'failed') { $('noar').style.display = 'block'; } });
+mv.addEventListener('load', () => setTimeout(() => { if (!mv.canActivateAR) $('noar').style.display = 'block'; }, 800));
+
+/* ---------------- camera mode (works on any phone) ---------------- */
+let stream, a0 = null, b0 = null, ori = false;
+async function startCam(){
+  ac();
+  try { if (typeof DeviceOrientationEvent !== 'undefined' && DeviceOrientationEvent.requestPermission) await DeviceOrientationEvent.requestPermission(); } catch (e) {}
+  try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false }); }
+  catch (e) { bubble('Please allow the camera to use Camera mode.', 4000); return; }
+  $('cam').srcObject = stream; document.body.classList.add('camOn'); window.scrollTo(0, 0);
+  mv.cameraOrbit = '0deg 80deg 1.5m'; mv.removeAttribute('camera-controls'); a0 = b0 = null;
+  if (!ori) { window.addEventListener('deviceorientation', onOri); ori = true; }
+  setTimeout(hello, 600);
+}
+function stopCam(){ if (stream) stream.getTracks().forEach(t => t.stop()); document.body.classList.remove('camOn'); mv.style.transform = ''; mv.setAttribute('camera-controls', ''); mv.cameraOrbit = '20deg 78deg 1.3m'; }
+function onOri(e){
+  if (!document.body.classList.contains('camOn') || e.alpha == null) return;
+  if (a0 === null) { a0 = e.alpha; b0 = e.beta; }
+  let da = e.alpha - a0; if (da > 180) da -= 360; if (da < -180) da += 360;
+  const db = e.beta - b0, k = window.innerWidth / 55;
+  mv.style.transform = `translate(${(da * k).toFixed(1)}px, ${(db * k).toFixed(1)}px)`;
+  mv.cameraOrbit = `${(-da * .6).toFixed(1)}deg ${(80 - db * .3).toFixed(1)}deg 1.5m`;
+}
+$('camBtn').addEventListener('click', startCam);
+$('cHello').addEventListener('click', hello);
+$('cDance').addEventListener('click', dance);
+$('cExit').addEventListener('click', stopCam);
+if (window.speechSynthesis) speechSynthesis.getVoices();
+</script>
+</body>
+</html>
